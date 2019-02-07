@@ -71,7 +71,6 @@ SET first_name = 'Groucho'
 WHERE last_name = 'Harpo' AND last_name = 'Williams';
 
 #5a. You cannot locate the schema of the address table. Which query would you use to re-create it?
-DESCRIBE sakila.address
 
 #6a. Use JOIN to display the first and last names, as well as the address, of each staff member. 
 #Use the tables staff and address:
@@ -96,7 +95,13 @@ film.film_id = film_actor.film_id
 GROUP BY film.title;
 
 #6d. How many copies of the film Hunchback Impossible exist in the inventory system?
-2
+SELECT * FROM inventory
+SELECT COUNT(inventory.film_id) AS total, film_title
+FROM film
+JOIN inventory ON 
+film.film_id = inventory.film_id
+WHERE film_id = 'Hunchback Impossible'
+GROUP BY film_title;
 
 #6e. Using the tables payment and customer and the JOIN command, list the total paid by each customer. 
 #List the customers alphabetically by last name:
@@ -170,7 +175,7 @@ SELECT store_id
 
 #7h. List the top five genres in gross revenue in descending order. 
 #(Hint: you may need to use the following tables: category, film_category, inventory, payment, and rental.)
-SELECT name
+SELECT name AS "Top Five Genres", SUM(payment.amount) as "Revenue"
   FROM category
     WHERE category_id
     IN (
@@ -180,9 +185,9 @@ SELECT name
         IN (
           SELECT film_id
             FROM inventory
-            WHERE staff_id
+            WHERE inventory_id
             IN (
-              SELECT staff_id
+              SELECT inventory_id
                 FROM payment
                 WHERE rental_id
               )
@@ -192,7 +197,7 @@ SELECT name
 #8a. In your new role as an executive, you would like to have an easy way of viewing the Top 5 genres by gross revenue. 
 #Use the solution from the problem above to create a view. 
 #If you haven't solved 7h, you can substitute another query to create a view.
-SELECT name
+SELECT name AS "Top Five Genres", SUM(payment.amount) as "Revenue"
   FROM category
     WHERE category_id
     IN (
@@ -202,9 +207,9 @@ SELECT name
         IN (
           SELECT film_id
             FROM inventory
-            WHERE staff_id
+            WHERE inventory_id
             IN (
-              SELECT staff_id
+              SELECT inventory_id
                 FROM payment
                 WHERE rental_id
               )
@@ -212,6 +217,7 @@ SELECT name
 		)
               
 #8b. How would you display the view that you created in 8a?
-The code needs to be perfected.
+SELECT * FROM "Top Five Genres"
 
 #8c. You find that you no longer need the view top_five_genres. Write a query to delete it.
+DROP VIEW "Top Five Genres"
